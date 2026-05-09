@@ -15,7 +15,7 @@ const FormSchema = z.object({
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-export async function createInvoice(formData: FormData) {
+export async function createInvoice(formData: FormData): Promise<void> {
   const { customerId, amount, status } = CreateInvoice.parse({
     customerId: formData.get("customerId"),
     amount: formData.get("amount"),
@@ -30,9 +30,7 @@ export async function createInvoice(formData: FormData) {
     `;
   } catch (error) {
     console.error(error);
-    return {
-      message: "Database Error : Failed to create invoices.",
-    };
+    return;
   }
   revalidatePath("/dashboard/invoices");
   redirect("/dashboard/invoices");
@@ -41,7 +39,10 @@ export async function createInvoice(formData: FormData) {
 // Utilisation de zod pour mettre a jour les types attendus //
 const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 
-export async function updateInvoice(id: string, formData: FormData) {
+export async function updateInvoice(
+  id: string,
+  formData: FormData,
+): Promise<void> {
   const { customerId, amount, status } = UpdateInvoice.parse({
     customerId: formData.get("customerId"),
     amount: formData.get("amount"),
@@ -57,7 +58,7 @@ export async function updateInvoice(id: string, formData: FormData) {
     `;
   } catch (error) {
     console.error(error);
-    return { message: "Database Error: Failed to Update Invoice." };
+    return;
   }
 
   revalidatePath("/dashboard/invoices");
